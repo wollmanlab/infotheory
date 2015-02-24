@@ -1,20 +1,20 @@
 function [Imax,qopt,Ijack] = calcChannelCapacity(Esb,varargin)
 
-arg.jackknife = false;
+arg.jackknife = true;
 arg.jackreplicas = 1; 
 arg.festim = {}; 
 arg.qopt = []; 
-arg.k=10; 
+arg.k=1; 
 arg = parseVarargin(varargin,arg);
 
 %% jackknife if needed
 if arg.jackknife && isempty(arg.qopt)
-    jackProb = repmat(linspace(0.6,0.95,20),1,arg.jackreplicas);
+    jackProb = repmat(linspace(0.9,0.95,20),1,arg.jackreplicas);
     Ijack = nan(size(jackProb));
     parfor i=1:numel(jackProb)
         IX = cellfun(@(e) randsample(size(e,2),ceil(jackProb(i)*size(e,2))),Esb,'uniformoutput',0);
         Ejack = cellfun(@(e,ix) e(:,ix),Esb,IX,'uniformoutput',0);
-        Ijack(i) = calcChannelCapacity(Ejack);
+        Ijack(i) = calcChannelCapacity(Ejack, 'jackknife', false);
     end
     b = regress(Ijack(:),[ones(numel(jackProb),1) 1./jackProb(:)]);
     Imax = b(1); 

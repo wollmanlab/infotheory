@@ -1,7 +1,19 @@
 function ErkSB = subSampleErkData(Erk,Terk,varargin)
 
+if iscell(Erk)
+    numImages = size(Erk{1},1);
+    seconds = (numImages-1).*60;
+    if numImages<60
+        numImages = 60;
+        seconds = 3540;
+    end
+else
+    numImages = 60;
+    seconds = 60*59;
+end
+
 arg.flt = sum(fspecial('gauss',7,2));
-arg.tgrid = (0:60:3540)';
+arg.tgrid = (0:numImages:seconds)';
 arg.dim = 10; 
 arg.tsample = []; % which minutes to sample from
 arg = parseVarargin(varargin,arg); 
