@@ -23,13 +23,14 @@ fH = @(F) -sum(log2(F(F>eps)))/nnz(F>eps);
 Hr_s = cellfun(fH,Fself);
 
 %% create weights for a weighted average of the contribution of the non-conditional densities
-Wq = cellfun(@(q,f) ones(size(f))*q,num2cell(q),F,'uniformoutput',0); 
+%Wq = cellfun(@(q,f) ones(size(f))*q,num2cell(q),F,'uniformoutput',0); 
+Wq = cellfun(@(q,f) ones(size(f))*q/length(ones(size(f))),num2cell(q),F,'uniformoutput',0); %LeeLab_SG_line modified to match supplement
 Wq = cat(1,Wq{:}); 
 Fall = cat(1,F{:});
 Fall(Fall<=eps)=nan; 
 
 
-Wq = Wq./nansum(Wq); 
+%Wq = Wq./nansum(Wq); % LeeLab_SG_Commented out original line
 Hr = -nansum(log2(Fall).*Wq); 
 
 I = Hr-sum(q.*Hr_s);
